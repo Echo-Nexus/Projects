@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <title>Song player | By Komal Chaudhary</title>
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+            rel="stylesheet"
+        />
+
+        <style type="text/css" media="all">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                height: 100vh;
+                width: 100vw;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #f3f3f3;
+                font-family: sans-serif;
+            }
+
+            .song-layout {
+                width: 90%;
+                max-width: 400px;
+                background: white;
+                border: 3px solid black;
+                border-radius: 15px;
+                padding: 2rem 1rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .song-image {
+                width: 175px;
+                height: 175px;
+                border: 2px solid black;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+
+            .title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                text-align: center;
+            }
+
+            .control-btn {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                width: 100%;
+                max-width: 300px;
+                font-size: 2rem;
+            }
+
+            .material-symbols-outlined {
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+
+            .material-symbols-outlined:active {
+                transform: scale(1.2);
+            }
+
+            audio {
+                width: 100%;
+                margin-top: 1rem;
+                outline: none;
+            }
+
+            /* 📱 Extra responsive for smaller devices */
+            @media (max-width: 400px) {
+                .song-layout {
+                    padding: 1rem;
+                }
+
+                .song-image {
+                    width: 150px;
+                    height: 150px;
+                }
+
+                .title {
+                    font-size: 1.2rem;
+                }
+
+                .control-btn {
+                    font-size: 1.5rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <section class="song-layout">
+            <img
+                src="Assets/Messenger_creation_3190075491151121.jpeg"
+                class="song-image"
+            />
+
+            <div class="title">Play song</div>
+            <div class="control-btn">
+                <span class="material-symbols-outlined previous">
+                    skip_previous
+                </span>
+                <span class="material-symbols-outlined play"> play_arrow </span>
+                <span class="material-symbols-outlined next"> skip_next </span>
+            </div>
+            <audio src="" class="audio"></audio>
+        </section>
+        <script type="text/javascript" charset="utf-8">
+            const songImgs = document.querySelector(".song-image");
+            const songTitle = document.querySelector(".title");
+            const songAudio = document.querySelector(".audio");
+            const previousBtn = document.querySelector(".previous");
+            const playPauseBtn = document.querySelector(".play");
+            const nextBtn = document.querySelector(".next");
+            const volume = document.querySelector(".volume");
+            const songLayout = document.querySelector(".song-layout");
+            let idx = 0;
+
+            const songs = [
+                {
+                    songTitle: "Aau Na",
+                    songUrl: "Aau Na.mp3",
+                    songImg: "Assets/artistic-conception.jpg"
+                },
+                {
+                    songTitle: "Badlirahaney Maya",
+                    songUrl: "Badlirahaney Maya.mp3",
+                    songImg: "Assets/coconut-in-beach.jpg"
+                },
+                {
+                    songTitle: "Finding Her",
+                    songUrl: "Finding Her.mp3",
+                    songImg: "Assets/crane.jpg"
+                },
+                {
+                    songTitle: "Get Together",
+                    songUrl: "Get Together.mp3",
+                    songImg: "Assets/cup-beauty.jpg"
+                },
+                {
+                    songTitle: "Jhut",
+                    songUrl: "JHUT.mp3",
+                    songImg: "Assets/beachHouse.jpg"
+                }
+            ];
+
+            function playSong() {
+                isPlaying = true;
+                playPauseBtn.onclick = isPlaying ? pauseSong : playSong;
+                songAudio.src = songs[idx].songUrl;
+                songTitle.innerText = songs[idx].songTitle;
+                songImgs.src = songs[idx].songImg;
+                playPauseBtn.innerText = "pause";
+                songLayout.style.backgroundColor = "#e9edc9";
+                songAudio.load();
+                songAudio.play();
+            }
+
+            function pauseSong() {
+                isPlaying = false;
+                playPauseBtn.onclick = isPlaying ? pauseSong : playSong;
+                playPauseBtn.innerText = "play_arrow";
+                songLayout.style.backgroundColor = "#ccd5ae";
+                songAudio.load();
+                songAudio.pause();
+            }
+
+            let isPlaying = false;
+            //playPauseBtn.onclick = isPlaying ? pauseSong : playSong;
+            playPauseBtn.onclick = () => {
+                if (isPlaying) {
+                    pauseSong();
+                } else {
+                    playSong();
+                }
+            };
+
+            nextBtn.onclick = () => {
+                idx = (idx + 1) % songs.length;
+                playSong();
+            };
+
+            previousBtn.onclick = () => {
+                idx = (idx - 1 + songs.length) % songs.length;
+                playSong();
+            };
+        </script>
+    </body>
+</html>
