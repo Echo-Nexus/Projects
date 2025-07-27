@@ -3,7 +3,6 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
         <title>Song player | By Komal Chaudhary</title>
 
         <link
@@ -28,7 +27,7 @@
                 font-family: sans-serif;
             }
 
-       #discription {
+            #discription {
                 font-size: 20px;
                 font-weight: 700;
                 font-family: Helvetica;
@@ -67,6 +66,19 @@
                 object-fit: cover;
             }
 
+            .spin {
+                animation: spin 4s linear infinite;
+            }
+
+            @keyframes spin {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
             .title {
                 font-size: 1.5rem;
                 font-weight: 700;
@@ -97,7 +109,6 @@
                 outline: none;
             }
 
-            /* 📱 Extra responsive for smaller devices */
             @media (max-width: 400px) {
                 .song-layout {
                     padding: 1rem;
@@ -118,9 +129,11 @@
             }
         </style>
     </head>
+
     <body>
-      <p id="discription">HELLO °_° I MADE THIS WEBSITE</p>
-        <img src="IMG_20250719_140929.jpg" alt="Logo" id="logo" />
+        <p id="discription">HELLO °_° I MADE THIS WEBSITE</p>
+        <img src="IMG_20250719_140929.jpg" alt="My photo" id="logo" />
+
         <section class="song-layout">
             <img
                 src="Messenger_creation_3190075491151121.jpeg"
@@ -128,15 +141,18 @@
             />
 
             <div class="title">Play song</div>
+
             <div class="control-btn">
-                <span class="material-symbols-outlined previous">
-                    skip_previous
-                </span>
-                <span class="material-symbols-outlined play"> play_arrow </span>
-                <span class="material-symbols-outlined next"> skip_next </span>
+                <span class="material-symbols-outlined previous"
+                    >skip_previous</span
+                >
+                <span class="material-symbols-outlined play">play_arrow</span>
+                <span class="material-symbols-outlined next">skip_next</span>
             </div>
+
             <audio src="" class="audio"></audio>
         </section>
+
         <script type="text/javascript" charset="utf-8">
             const songImgs = document.querySelector(".song-image");
             const songTitle = document.querySelector(".title");
@@ -144,11 +160,21 @@
             const previousBtn = document.querySelector(".previous");
             const playPauseBtn = document.querySelector(".play");
             const nextBtn = document.querySelector(".next");
-            const volume = document.querySelector(".volume");
             const songLayout = document.querySelector(".song-layout");
             let idx = 0;
+            let isPlaying = false;
 
             const songs = [
+                {
+                    songTitle: "I love Science",
+                    songUrl: "I will not stop.mp3",
+                    songImg: "fall-leaves.jpg"
+                },
+                {
+                    songTitle: "Get Together",
+                    songUrl: "Get Together.mp3",
+                    songImg: "cup-beauty.jpg"
+                },                
                 {
                     songTitle: "Aau Na",
                     songUrl: "Aau Na.mp3",
@@ -165,25 +191,15 @@
                     songImg: "crane.jpg"
                 },
                 {
-                    songTitle: "Get Together",
-                    songUrl: "Get Together.mp3",
-                    songImg: "cup-beauty.jpg"
-                },
-                {
                     songTitle: "Jhut",
                     songUrl: "JHUT.mp3",
                     songImg: "beachHouse.jpg"
                 },
-                {
-                  songTitle: "I love Science",
-                  songUrl: "I will not stop.mp3",
-                  songImg:"fall-leaves.jpg"
-                }
             ];
 
             function playSong() {
                 isPlaying = true;
-                playPauseBtn.onclick = isPlaying ? pauseSong : playSong;
+                playPauseBtn.onclick = pauseSong;
                 songAudio.src = songs[idx].songUrl;
                 songTitle.innerText = songs[idx].songTitle;
                 songImgs.src = songs[idx].songImg;
@@ -191,19 +207,18 @@
                 songLayout.style.backgroundColor = "#e9edc9";
                 songAudio.load();
                 songAudio.play();
+                songImgs.classList.add("spin"); // Start spinning
             }
 
             function pauseSong() {
                 isPlaying = false;
-                playPauseBtn.onclick = isPlaying ? pauseSong : playSong;
+                playPauseBtn.onclick = playSong;
                 playPauseBtn.innerText = "play_arrow";
                 songLayout.style.backgroundColor = "#ccd5ae";
-                songAudio.load();
                 songAudio.pause();
+                songImgs.classList.remove("spin"); // Stop spinning
             }
 
-            let isPlaying = false;
-            //playPauseBtn.onclick = isPlaying ? pauseSong : playSong;
             playPauseBtn.onclick = () => {
                 if (isPlaying) {
                     pauseSong();
