@@ -1,247 +1,987 @@
-<!doctype html>
-<html>
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Song player | By Komal Chaudhary</title>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <link
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-            rel="stylesheet"
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://plus.unsplash.com/premium_vector-1711987689675-439d95531384?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      sizes="32x32"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="https://plus.unsplash.com/premium_vector-1711987689675-439d95531384?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    />
+
+    <title>Velvet Audio</title>
+    <!-- Load Tailwind CSS -->
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Load Google Icons (Material Symbols) -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+
+    <style>
+      /* Custom styles for responsiveness and appearance */
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0d1117; /* Dark background */
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background-color: #10b981; /* Emerald 500 */
+        border-radius: 9999px;
+        transition: width 0.1s linear;
+      }
+
+      .material-symbols-rounded {
+        /* Ensuring icons are visible and interactive */
+        font-variation-settings: "FILL" 0, "wght" 300, "GRAD" 0, "opsz" 40;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+      }
+
+      .control-icon:hover {
+        color: #10b981; /* Emerald 500 on hover */
+        transform: scale(1.1);
+      }
+
+      .active-control {
+        color: #10b981; /* Emerald 500 */
+        text-shadow: 0 0 8px rgba(16, 185, 129, 0.8); /* Green glow */
+        transform: scale(1.1);
+      }
+
+      /* Specific styling for the active favorite heart */
+      #favorite-btn.active-control {
+        color: #ec4899; /* Pink 500 for active favorite */
+        text-shadow: 0 0 8px rgba(236, 72, 153, 0.8);
+      }
+
+      .play-pause-icon {
+        font-size: 3.5rem; /* Larger central button */
+        transition: transform 0.2s ease;
+      }
+      .play-pause-icon:active {
+        transform: scale(0.95);
+      }
+
+      /* Hide the default input range thumb */
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #10b981;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+        margin-top: -6px; /* Adjust to align with the track */
+      }
+
+      /* --- HEARTBEAT PULSE ANIMATION --- */
+      @keyframes heartbeat-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 20px rgba(16, 185, 129, 0);
+        }
+        50% {
+          transform: scale(1.02);
+          box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
+        }
+      }
+
+      .pulse {
+        animation: heartbeat-pulse 1.2s infinite ease-in-out;
+      }
+
+      /* Custom Styles for Drawers (start off-screen) */
+      .drawer {
+        transform: translatex(100%);
+      }
+      .drawer.open {
+        transform: translatex(0);
+      }
+    </style>
+  </head>
+
+  <body class="flex items-center justify-center min-h-screen p-4">
+    <!-- Music Player Card (Responsive) -->
+    <div
+      id="player-card"
+      class="w-full max-w-xs sm:max-w-md bg-gray-800 rounded-xl shadow-2xl overflow-hidden p-6 text-white transition-transform duration-300 relative"
+    >
+      <!-- Album Art Container (Now relative for download button positioning) -->
+      <div class="mb-6 mt-6 relative">
+        <img
+          id="album-art"
+          src="https://placehold.co/400x400/10b981/ffffff?text=Symphony+Player"
+          alt="Album artwork"
+          class="w-full h-auto object-cover rounded-lg shadow-xl aspect-square transition-all duration-500 ease-in-out"
         />
 
-        <style type="text/css" media="all">
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
+        <!-- Download Button (New position: Bottom right of the image) -->
+        <button
+          id="download-btn-wrapper"
+          class="absolute bottom-2 right-2 p-2 bg-gray-900/70 backdrop-blur-sm rounded-full shadow-lg hover:bg-gray-900 transition-all duration-200"
+          title="Download Song"
+        >
+          <span
+            class="material-symbols-rounded text-xl text-white hover:text-blue-400"
+            >download</span
+          >
+        </button>
+      </div>
+
+      <!-- Track Information -->
+      <div class="text-center mb-6">
+        <h2 id="track-title" class="text-2xl font-bold truncate">
+          Loading Track...
+        </h2>
+        <p id="track-artist" class="text-sm text-gray-400">Artist Name</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="mb-6 space-y-2">
+        <div
+          id="progress-container"
+          class="w-full h-1 bg-gray-600 rounded-full cursor-pointer relative"
+          onclick="handleSeek(event)"
+        >
+          <!-- This div represents the progress of the song -->
+          <div id="progress-bar-fill" class="progress-bar-fill w-0"></div>
+          <!-- The range input is invisible but handles the seeking logic -->
+          <input
+            type="range"
+            id="progress-slider"
+            min="0"
+            max="100"
+            value="0"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            oninput="updateProgress(this.value)"
+          />
+        </div>
+
+        <div class="flex justify-between text-xs text-gray-400 font-mono">
+          <span id="current-time">00:00</span>
+          <span id="total-time">00:00</span>
+        </div>
+      </div>
+
+      <!-- Player Controls - ALL BUTTONS IN ONE ROW (minus Download) -->
+      <div class="flex justify-center items-center py-2 space-x-2 sm:space-x-4">
+        <!-- 1. Favorite Icon (Left Utility) -->
+        <span
+          id="favorite-btn"
+          class="material-symbols-rounded text-2xl control-icon"
+          title="Favorite Track"
+          >favorite_border</span
+        >
+
+        <!-- 2. Shuffle/Repeat Mode (Left Utility) -->
+        <span
+          id="mode-btn"
+          class="material-symbols-rounded text-2xl control-icon"
+          title="Mode Off"
+          >shuffle</span
+        >
+
+        <!-- NEW: Rewind 10s Button -->
+        <span
+          id="rewind-btn"
+          class="material-symbols-rounded text-3xl text-gray-400 control-icon"
+          title="Rewind 10 Seconds"
+          >replay_10</span
+        >
+
+        <!-- 3. Previous Track (Skip Control) -->
+        <span
+          id="prev-btn"
+          class="material-symbols-rounded text-4xl text-gray-200 control-icon"
+          title="Previous Track"
+          >skip_previous</span
+        >
+
+        <!-- 4. Play/Pause Button (Centerpiece) -->
+        <button
+          id="play-pause-btn"
+          class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg hover:shadow-emerald-500/50 transition duration-150"
+        >
+          <span
+            id="play-pause-icon"
+            class="material-symbols-rounded text-white play-pause-icon"
+            style="font-size: 40px; margin-left: 2px"
+            >play_arrow</span
+          >
+        </button>
+
+        <!-- 5. Next Track (Skip Control) -->
+        <span
+          id="next-btn"
+          class="material-symbols-rounded text-4xl text-gray-200 control-icon"
+          title="Next Track"
+          >skip_next</span
+        >
+
+        <!-- NEW: Forward 10s Button -->
+        <span
+          id="forward-btn"
+          class="material-symbols-rounded text-3xl text-gray-400 control-icon"
+          title="Forward 10 Seconds"
+          >forward_10</span
+        >
+
+        <!-- 6. Playlist Toggle (Right Utility) -->
+        <span
+          id="playlist-toggle-btn"
+          class="material-symbols-rounded text-2xl control-icon"
+          title="Show Playlist"
+          >queue_music</span
+        >
+
+        <!-- 7. Favorite List Toggle (Far Right Utility - Icon changed to 'bookmarks') -->
+        <span
+          id="favorite-list-toggle-btn"
+          class="material-symbols-rounded text-2xl control-icon hover:text-pink-400"
+          title="Favorite List"
+          >bookmarks</span
+        >
+      </div>
+    </div>
+
+    <!-- Playlist Drawer -->
+    <div
+      id="playlist-drawer"
+      class="fixed top-0 right-0 w-full max-w-xs h-full bg-gray-900 shadow-2xl drawer transition-transform duration-300 z-50 text-white p-6 overflow-y-auto"
+    >
+      <div
+        class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4"
+      >
+        <h3 class="text-xl font-bold text-emerald-400">Up Next</h3>
+        <span
+          id="close-playlist-btn"
+          class="material-symbols-rounded text-gray-400 hover:text-white cursor-pointer"
+          >close</span
+        >
+      </div>
+      <div id="playlist-content" class="space-y-3">
+        <!-- Song items will be injected here by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Favorite List Drawer (Now using Local Storage) -->
+    <div
+      id="favorite-drawer"
+      class="fixed top-0 right-0 w-full max-w-xs h-full bg-gray-900 shadow-2xl drawer transition-transform duration-300 z-50 text-white p-6 overflow-y-auto"
+    >
+      <div
+        class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4"
+      >
+        <h3 class="text-xl font-bold text-pink-400">Favorite Tracks</h3>
+        <!-- The close button is now properly linked to the JS function -->
+        <span
+          id="close-favorite-list-btn"
+          class="material-symbols-rounded text-gray-400 hover:text-white cursor-pointer"
+          >close</span
+        >
+      </div>
+      <div id="favorite-content" class="space-y-3">
+        <p id="favorite-loading" class="text-gray-500">Loading favorites...</p>
+        <!-- Favorite song items will be injected here by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Hidden HTML Audio Element to handle playback -->
+    <audio id="audio-player" class="hidden"></audio>
+
+    <script src="songs.js"></script>
+    <script type="module">
+      // Global variables and constants
+
+      let currentTrackIndex = 0;
+      let isPlaying = false;
+      let favorites = []; // Array to store favorited track objects from Local Storage
+
+      // Control States
+      let isShuffling = false;
+      let repeatMode = 0; // 0: Off, 1: Repeat All, 2: Repeat One
+
+      // VIBRATION CONTROLS
+      let vibrationInterval;
+      const VIBRATION_DURATION = 50;
+      const VIBRATION_INTERVAL = 500;
+
+      // DOM Elements
+      const audioPlayer = document.getElementById("audio-player");
+      const playPauseIcon = document.getElementById("play-pause-icon");
+      const playPauseBtn = document.getElementById("play-pause-btn");
+      const nextBtn = document.getElementById("next-btn");
+      const prevBtn = document.getElementById("prev-btn");
+      const trackTitle = document.getElementById("track-title");
+      const trackArtist = document.getElementById("track-artist");
+      const albumArt = document.getElementById("album-art");
+      const currentTimeEl = document.getElementById("current-time");
+      const totalTimeEl = document.getElementById("total-time");
+      const progressBarFill = document.getElementById("progress-bar-fill");
+      const progressSlider = document.getElementById("progress-slider");
+      const playerCard = document.getElementById("player-card");
+      const modeBtn = document.getElementById("mode-btn");
+
+      // New DOM elements for 10s navigation
+      const rewindBtn = document.getElementById("rewind-btn");
+      const forwardBtn = document.getElementById("forward-btn");
+
+      const playlistDrawer = document.getElementById("playlist-drawer");
+      const playlistContent = document.getElementById("playlist-content");
+      const playlistToggleButton = document.getElementById(
+        "playlist-toggle-btn"
+      );
+      const closePlaylistBtn = document.getElementById("close-playlist-btn");
+
+      // Favorite/Download Elements - Download button now targets the wrapper
+      const downloadBtnWrapper = document.getElementById(
+        "download-btn-wrapper"
+      );
+      const favoriteBtn = document.getElementById("favorite-btn");
+      const favoriteListToggleBtn = document.getElementById(
+        "favorite-list-toggle-btn"
+      );
+      const favoriteDrawer = document.getElementById("favorite-drawer");
+      const closeFavoriteListBtn = document.getElementById(
+        "close-favorite-list-btn"
+      );
+      const favoriteContent = document.getElementById("favorite-content");
+      const favoriteLoading = document.getElementById("favorite-loading");
+
+      /**
+       * Converts total seconds into MM:SS format.
+       */
+      function formatTime(seconds) {
+        if (isNaN(seconds) || seconds < 0) return "00:00";
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        const paddedMinutes = String(minutes).padStart(2, "0");
+        const paddedSeconds = String(remainingSeconds).padStart(2, "0");
+        return `${paddedMinutes}:${paddedSeconds}`;
+      }
+
+      /**
+       * Starts the periodic vibration loop.
+       */
+      function startVibrationLoop() {
+        if (navigator.vibrate) {
+          navigator.vibrate(VIBRATION_DURATION);
+          vibrationInterval = setInterval(() => {
+            if (isPlaying) {
+              navigator.vibrate(VIBRATION_DURATION);
+            } else {
+              stopVibrationLoop();
             }
+          }, VIBRATION_INTERVAL);
+        }
+      }
 
-            body {
-                height: 100vh;
-                width: 100vw;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background: #f3f3f3;
-                font-family: sans-serif;
+      /**
+       * Stops the vibration loop.
+       */
+      function stopVibrationLoop() {
+        if (vibrationInterval) {
+          clearInterval(vibrationInterval);
+          vibrationInterval = null;
+        }
+        if (navigator.vibrate) {
+          navigator.vibrate(0);
+        }
+      }
+
+      /**
+       * Toggles the visibility of the main playlist drawer.
+       */
+      function togglePlaylist(force = null) {
+        const isVisible = playlistDrawer.classList.contains("open");
+        const newState = force !== null ? force : !isVisible;
+
+        if (newState) {
+          // Close favorite list if it's open
+          toggleFavoriteList(false);
+          playlistDrawer.classList.remove("drawer");
+          playlistDrawer.classList.add("open");
+          renderPlaylist();
+        } else {
+          playlistDrawer.classList.add("drawer");
+          playlistDrawer.classList.remove("open");
+        }
+      }
+
+      /**
+       * Toggles the visibility of the favorite list drawer.
+       */
+      function toggleFavoriteList(force = null) {
+        const isVisible = favoriteDrawer.classList.contains("open");
+        const newState = force !== null ? force : !isVisible;
+
+        if (newState) {
+          // Close main playlist if it's open
+          togglePlaylist(false);
+          favoriteDrawer.classList.remove("drawer");
+          favoriteDrawer.classList.add("open");
+          renderFavoriteList();
+        } else {
+          favoriteDrawer.classList.add("drawer");
+          favoriteDrawer.classList.remove("open");
+        }
+      }
+
+      /**
+       * Renders the track list into the playlist drawer.
+       */
+      function renderPlaylist() {
+        playlistContent.innerHTML = "";
+        tracks.forEach((track, index) => {
+          const isActive = index === currentTrackIndex;
+          const songItem = document.createElement("div");
+          songItem.className = `p-3 rounded-lg flex justify-between items-center cursor-pointer transition-all duration-200 ${
+            isActive
+              ? "bg-emerald-600/50 hover:bg-emerald-600 text-white shadow-md"
+              : "hover:bg-gray-700 text-gray-300"
+          }`;
+          songItem.dataset.index = index;
+          songItem.onclick = () => {
+            if (index !== currentTrackIndex) {
+              currentTrackIndex = index;
+              loadTrack(true);
             }
+            togglePlaylist(false);
+          };
 
-            #discription {
-                font-size: 20px;
-                font-weight: 700;
-                font-family: Helvetica;
-                position: fixed;
-                top: 25%;
-                text-align: center;
+          const icon = isActive
+            ? `<span class="material-symbols-rounded text-sm mr-2 text-white">graphic_eq</span>`
+            : `<span class="text-sm mr-2 text-gray-500 font-mono">${String(
+                index + 1
+              ).padStart(2, "0")}.</span>`;
+
+          const formattedDuration = track.duration
+            ? formatTime(track.duration)
+            : "00:00";
+
+          songItem.innerHTML = `
+                    <div class="flex items-center w-3/4">
+                        ${icon}
+                        <div class="truncate">
+                            <p class="font-medium truncate">${track.title}</p>
+                            <p class="text-xs text-gray-400 truncate">${track.artist}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono">${formattedDuration}</span>
+                `;
+          playlistContent.appendChild(songItem);
+
+          if (isActive) {
+            // Scroll to current track
+            setTimeout(
+              () =>
+                songItem.scrollIntoView({
+                  behavior: "smooth",
+                  block: "nearest",
+                }),
+              350
+            );
+          }
+        });
+      }
+
+      // --- LOCAL STORAGE FUNCTIONS ---
+
+      /**
+       * Loads favorites from Local Storage.
+       */
+      function loadFavorites() {
+        try {
+          const storedFavorites = localStorage.getItem("symphony_favorites");
+          favorites = storedFavorites ? JSON.parse(storedFavorites) : [];
+        } catch (error) {
+          console.error("Error loading favorites from Local Storage:", error);
+          favorites = [];
+        }
+      }
+
+      /**
+       * Saves favorites to Local Storage.
+       */
+      function saveFavorites() {
+        try {
+          localStorage.setItem("symphony_favorites", JSON.stringify(favorites));
+        } catch (error) {
+          console.error("Error saving favorites to Local Storage:", error);
+        }
+      }
+
+      /**
+       * Renders the favorite track list into the favorite drawer.
+       */
+      function renderFavoriteList() {
+        favoriteContent.innerHTML = "";
+
+        if (favorites.length === 0) {
+          favoriteContent.innerHTML = `<p class="text-gray-500">No favorite tracks yet. Click the heart icon on a track to add it!</p>`;
+          return;
+        }
+
+        favoriteLoading.textContent = ""; // Hide loading text
+
+        // Display the current list of favorites
+        favorites.forEach((favTrack) => {
+          // Find the index in the main tracks array for playback functionality
+          const trackIndex = tracks.findIndex((t) => t.id === favTrack.id);
+          const isActive = trackIndex === currentTrackIndex;
+          const songItem = document.createElement("div");
+
+          songItem.className = `p-3 rounded-lg flex justify-between items-center cursor-pointer transition-all duration-200 ${
+            isActive
+              ? "bg-pink-600/50 hover:bg-pink-600 text-white shadow-md"
+              : "hover:bg-gray-700 text-gray-300"
+          }`;
+
+          songItem.onclick = () => {
+            if (trackIndex !== -1) {
+              currentTrackIndex = trackIndex;
+              loadTrack(true); // Load and play
             }
+            toggleFavoriteList(false);
+          };
 
-            #logo {
-                height: 150px;
-                position: fixed;
-                top: 20px;
-                left: 40%;
-                border-radius: 5px;
-            }
+          // Remove button for un-favoriting directly from the list
+          const removeBtn = document.createElement("span");
+          removeBtn.className =
+            "material-symbols-rounded text-lg text-gray-400 hover:text-white ml-2";
+          removeBtn.textContent = "delete";
+          removeBtn.title = "Remove from Favorites";
+          removeBtn.onclick = (e) => {
+            e.stopPropagation(); // Prevent playing the song when clicking delete
+            toggleFavorite(favTrack); // Unfavorite the item clicked
+          };
 
-            .song-layout {
-                width: 90%;
-                max-width: 400px;
-                background: white;
-                border: 3px solid black;
-                border-radius: 15px;
-                padding: 2rem 1rem;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 1.5rem;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            }
+          songItem.innerHTML = `
+                    <div class="flex items-center w-3/4">
+                        <span class="material-symbols-rounded text-lg text-pink-400 mr-2">favorite</span>
+                        <div class="truncate">
+                            <p class="font-medium truncate">${favTrack.title}</p>
+                            <p class="text-xs text-gray-400 truncate">${favTrack.artist}</p>
+                        </div>
+                    </div>
+                `;
+          songItem.appendChild(removeBtn);
+          favoriteContent.appendChild(songItem);
+        });
+      }
 
-            .song-image {
-                width: 175px;
-                height: 175px;
-                border: 2px solid black;
-                border-radius: 50%;
-                object-fit: cover;
-            }
+      /**
+       * Updates the UI for the mode button based on current state.
+       */
+      function updateModeUI() {
+        modeBtn.classList.remove("active-control");
+        modeBtn.textContent = "shuffle";
+        modeBtn.title = "Mode Off";
+        audioPlayer.loop = false;
 
-            .spin {
-                animation: spin 4s linear infinite;
-            }
+        if (isShuffling) {
+          modeBtn.classList.add("active-control");
+          modeBtn.textContent = "shuffle";
+          modeBtn.title = "Shuffle On";
+        } else if (repeatMode === 1) {
+          modeBtn.classList.add("active-control");
+          modeBtn.textContent = "repeat";
+          modeBtn.title = "Repeat All";
+        } else if (repeatMode === 2) {
+          modeBtn.classList.add("active-control");
+          modeBtn.textContent = "repeat_one";
+          modeBtn.title = "Repeat One";
+          audioPlayer.loop = true;
+        }
+      }
 
-            @keyframes spin {
-                from {
-                    transform: rotate(0deg);
-                }
-                to {
-                    transform: rotate(360deg);
-                }
-            }
+      /**
+       * Cycles the mode.
+       */
+      function toggleMode() {
+        if (!isShuffling && repeatMode === 0) {
+          isShuffling = true;
+          repeatMode = 0;
+        } else if (isShuffling) {
+          isShuffling = false;
+          repeatMode = 1;
+        } else if (repeatMode === 1) {
+          isShuffling = false;
+          repeatMode = 2;
+        } else if (repeatMode === 2) {
+          isShuffling = false;
+          repeatMode = 0;
+        }
 
-            .title {
-                font-size: 1.5rem;
-                font-weight: 700;
-                text-align: center;
-            }
+        updateModeUI();
+      }
 
-            .control-btn {
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                width: 100%;
-                max-width: 300px;
-                font-size: 2rem;
-            }
+      /**
+       * Loads the currently selected track's data into the UI and sets the audio source.
+       * @param {boolean} shouldPlay - If true, automatically starts playback after loading.
+       */
+      function loadTrack(shouldPlay = false) {
+        const track = tracks[currentTrackIndex];
 
-            .material-symbols-outlined {
-                cursor: pointer;
-                transition: transform 0.2s ease;
-            }
+        // 1. Set the audio source and load the file
+        audioPlayer.src = track.url;
+        audioPlayer.load();
 
-            .material-symbols-outlined:active {
-                transform: scale(1.2);
-            }
+        trackTitle.textContent = track.title;
+        trackArtist.textContent = track.artist;
+        albumArt.src = track.art;
 
-            audio {
-                width: 100%;
-                margin-top: 1rem;
-                outline: none;
-            }
+        updateModeUI();
+        updateFavoriteUI(); // Update the heart icon state
 
-            @media (max-width: 400px) {
-                .song-layout {
-                    padding: 1rem;
-                }
+        // Reset UI time and progress
+        currentTimeEl.textContent = "00:00";
+        totalTimeEl.textContent = "00:00";
+        progressSlider.value = 0;
+        progressBarFill.style.width = "0%";
 
-                .song-image {
-                    width: 150px;
-                    height: 150px;
-                }
+        // 2. Listen for metadata to get the actual duration
+        audioPlayer.onloadedmetadata = () => {
+          track.duration = audioPlayer.duration; // Get real duration
+          totalTimeEl.textContent = formatTime(track.duration);
+          progressSlider.max = track.duration;
+          updateProgressBar(0);
+          renderPlaylist();
 
-                .title {
-                    font-size: 1.2rem;
-                }
-
-                .control-btn {
-                    font-size: 1.5rem;
-                }
-            }
-        </style>
-    </head>
-
-    <body>
-        <p id="discription">HELLO °_° I MADE THIS WEBSITE</p>
-        <img src="IMG_20250719_140929.jpg" alt="My photo" id="logo" />
-
-        <section class="song-layout">
-            <img
-                src="Messenger_creation_3190075491151121.jpeg"
-                class="song-image"
-            />
-
-            <div class="title">Play song</div>
-
-            <div class="control-btn">
-                <span class="material-symbols-outlined previous"
-                    >skip_previous</span
-                >
-                <span class="material-symbols-outlined play">play_arrow</span>
-                <span class="material-symbols-outlined next">skip_next</span>
-            </div>
-
-            <audio src="" class="audio"></audio>
-        </section>
-
-        <script type="text/javascript" charset="utf-8">
-            const songImgs = document.querySelector(".song-image");
-            const songTitle = document.querySelector(".title");
-            const songAudio = document.querySelector(".audio");
-            const previousBtn = document.querySelector(".previous");
-            const playPauseBtn = document.querySelector(".play");
-            const nextBtn = document.querySelector(".next");
-            const songLayout = document.querySelector(".song-layout");
-            let idx = 0;
-            let isPlaying = false;
-
-            const songs = [
-
-                {
-                    songTitle: "I dreamed",
-                    songUrl: "https://www.dropbox.com/scl/fi/rry99wzyfsi2wa5b71fqc/Sushant_KC_-_All_I_ever_dreamed__Lyric_Video_.MP4?rlkey=5w585yfqog8v9fvyydf7v3vyz&st=k4vjmwf3&&raw=1",
-                    songImg: "https://www.dropbox.com/scl/fi/t14s4t3ujxvyi8nqz3q9c/Screenshot_20250616_141721_Video-Player.jpg?rlkey=tbz6n05ib8urbv34dq0yvgwvl&st=jc0xe87c&&raw=1"
-                },
-                {
-                    songTitle: "I love Science (Song By AI)",
-                    songUrl: "I will not stop.mp3",
-                    songImg: "fall-leaves.jpg"
-                },
-                {
-                    songTitle: "Get Together",
-                    songUrl: "Get Together.mp3",
-                    songImg: "cup-beauty.jpg"
-                },                
-                {
-                    songTitle: "Aau Na",
-                    songUrl: "Aau Na.mp3",
-                    songImg: "artistic-conception.jpg"
-                },
-                {
-                    songTitle: "Badlirahaney Maya",
-                    songUrl: "Badlirahaney Maya.mp3",
-                    songImg: "coconut-in-beach.jpg"
-                },
-                {
-                    songTitle: "Finding Her",
-                    songUrl: "Finding Her.mp3",
-                    songImg: "crane.jpg"
-                },
-                {
-                    songTitle: "Jhut",
-                    songUrl: "JHUT.mp3",
-                    songImg: "beachHouse.jpg"
-                },
-            ];
-
-            function playSong() {
-                isPlaying = true;
-                playPauseBtn.onclick = pauseSong;
-                songAudio.src = songs[idx].songUrl;
-                songTitle.innerText = songs[idx].songTitle;
-                songImgs.src = songs[idx].songImg;
-                playPauseBtn.innerText = "pause";
-                songLayout.style.backgroundColor = "#e9edc9";
-                songAudio.load();
-                songAudio.play();
-                songImgs.classList.add("spin"); // Start spinning
-            }
-
-            function pauseSong() {
-                isPlaying = false;
-                playPauseBtn.onclick = playSong;
-                playPauseBtn.innerText = "play_arrow";
-                songLayout.style.backgroundColor = "#ccd5ae";
-                songAudio.pause();
-                songImgs.classList.remove("spin"); // Stop spinning
-            }
-
-            playPauseBtn.onclick = () => {
-                if (isPlaying) {
-                    pauseSong();
+          if (shouldPlay) {
+            audioPlayer
+              .play()
+              .then(() => {
+                // Play success handled by the 'play' event listener below
+              })
+              .catch((e) => {
+                // Gracefully handle the common "interrupted by a new load request" error
+                // This happens when the user rapidly skips tracks, causing the promise from
+                // the previous play call to be rejected before it resolves.
+                if (
+                  e.message &&
+                  e.message.includes("interrupted by a new load request")
+                ) {
+                  console.log(
+                    "Playback interrupted (expected during quick skipping)."
+                  );
                 } else {
-                    playSong();
+                  console.error(
+                    "Autoplay failed. User interaction may be required:",
+                    e
+                  );
+                  isPlaying = false;
+                  playPauseIcon.textContent = "play_arrow";
+                  stopVibrationLoop();
+                  playerCard.classList.remove("pulse");
                 }
-            };
+              });
+          } else {
+            playerCard.classList.remove("pulse");
+          }
+        };
 
-            nextBtn.onclick = () => {
-                idx = (idx + 1) % songs.length;
-                playSong();
-            };
+        // Apply color tint to player card based on album art (simulated)
+        const colorMap = {
+          0: "shadow-orange-500/50",
+          1: "shadow-green-500/50",
+          2: "shadow-blue-500/50",
+        };
+        // Safely remove previous shadow class before adding the new one
+        playerCard.className = playerCard.className.replace(
+          /shadow-\w+-\d+\/\d+/g,
+          ""
+        );
+        playerCard.classList.add(
+          colorMap[currentTrackIndex % Object.keys(colorMap).length]
+        );
 
-            previousBtn.onclick = () => {
-                idx = (idx - 1 + songs.length) % songs.length;
-                playSong();
-            };
-        </script>
-    </body>
+        renderPlaylist();
+      }
+
+      /**
+       * Toggles playback state.
+       */
+      function togglePlayPause() {
+        if (isPlaying) {
+          audioPlayer.pause();
+        } else {
+          audioPlayer.play().catch((e) => {
+            console.error("Playback failed (User action required):", e);
+          });
+        }
+      }
+
+      // Event listeners for actual play/pause events from the audio element
+      audioPlayer.addEventListener("play", () => {
+        playPauseIcon.textContent = "pause";
+        isPlaying = true;
+        startVibrationLoop();
+        playerCard.classList.add("pulse");
+      });
+
+      audioPlayer.addEventListener("pause", () => {
+        playPauseIcon.textContent = "play_arrow";
+        isPlaying = false;
+        stopVibrationLoop();
+        playerCard.classList.remove("pulse");
+      });
+
+      /**
+       * Updates the progress bar and time display based on current audio time.
+       */
+      function updateProgressBar(currentTime = audioPlayer.currentTime) {
+        const track = tracks[currentTrackIndex];
+        const duration = track.duration || 0;
+
+        if (duration === 0 || isNaN(duration)) {
+          currentTimeEl.textContent = formatTime(currentTime);
+          return;
+        }
+
+        const percent = (currentTime / duration) * 100;
+
+        currentTimeEl.textContent = formatTime(currentTime);
+        progressBarFill.style.width = `${percent}%`;
+        progressSlider.value = currentTime;
+      }
+
+      /**
+       * Jumps to a specific time based on click position.
+       */
+      function handleSeek(e) {
+        const container = document.getElementById("progress-container");
+        const rect = container.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const containerWidth = rect.width;
+
+        const seekRatio = clickX / containerWidth;
+        const newTime = seekRatio * (audioPlayer.duration || 0);
+
+        audioPlayer.currentTime = newTime;
+      }
+
+      /**
+       * Updates the progress when the slider is dragged/input.
+       */
+      function updateProgress(value) {
+        const newTime = parseFloat(value);
+        audioPlayer.currentTime = newTime;
+      }
+
+      /**
+       * Rewinds the current track by 10 seconds.
+       */
+      function handleRewind() {
+        audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 10);
+        if (navigator.vibrate) navigator.vibrate(20);
+      }
+
+      /**
+       * Forwards the current track by 10 seconds.
+       */
+      function handleForward() {
+        const duration = audioPlayer.duration || 0;
+        audioPlayer.currentTime = Math.min(
+          duration,
+          audioPlayer.currentTime + 10
+        );
+        if (navigator.vibrate) navigator.vibrate(20);
+      }
+
+      /**
+       * Handles changing to the next track, respecting shuffle/repeat all.
+       */
+      function handleNextTrack(triggeredByEnd = false) {
+        const wasPlaying = isPlaying;
+
+        if (repeatMode === 2 && triggeredByEnd) {
+          return;
+        }
+
+        let nextIndex;
+        if (isShuffling) {
+          do {
+            nextIndex = Math.floor(Math.random() * tracks.length);
+          } while (nextIndex === currentTrackIndex && tracks.length > 1);
+          currentTrackIndex = nextIndex;
+        } else {
+          currentTrackIndex++;
+        }
+
+        if (currentTrackIndex >= tracks.length) {
+          if (repeatMode === 1) {
+            currentTrackIndex = 0;
+          } else if (repeatMode === 0 && triggeredByEnd) {
+            currentTrackIndex = 0;
+            loadTrack(false);
+            isPlaying = false;
+            playPauseIcon.textContent = "play_arrow";
+            stopVibrationLoop();
+            playerCard.classList.remove("pulse");
+            return;
+          } else {
+            currentTrackIndex = 0;
+          }
+        }
+
+        loadTrack(wasPlaying);
+      }
+
+      /**
+       * Handles changing to the previous track.
+       */
+      function handlePreviousTrack() {
+        // If track is more than 3 seconds in, restart the track
+        if (audioPlayer.currentTime > 3) {
+          audioPlayer.currentTime = 0;
+        } else {
+          // Otherwise, skip to the previous track
+          currentTrackIndex =
+            (currentTrackIndex - 1 + tracks.length) % tracks.length;
+          loadTrack(isPlaying);
+        }
+      }
+
+      /**
+       * Handles downloading the current track.
+       */
+      function handleDownload() {
+        const currentTrack = tracks[currentTrackIndex];
+        if (!currentTrack.url) {
+          console.warn("No valid URL for download.");
+          return;
+        }
+
+        // Create a temporary anchor element
+        const link = document.createElement("a");
+        link.href = currentTrack.url;
+        // Suggest a filename
+        link.download = `${currentTrack.title} - ${currentTrack.artist}.mp3`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        console.log(`Download initiated for: ${currentTrack.title}`);
+      }
+
+      /**
+       * Checks if the current track is favorited and updates the UI accordingly.
+       */
+      function updateFavoriteUI() {
+        const currentTrack = tracks[currentTrackIndex];
+        const isFavorited = favorites.some((fav) => fav.id === currentTrack.id);
+
+        favoriteBtn.classList.toggle("active-control", isFavorited);
+        favoriteBtn.textContent = isFavorited ? "favorite" : "favorite_border";
+        favoriteBtn.title = isFavorited ? "Unfavorite Track" : "Favorite Track";
+      }
+
+      /**
+       * Adds or removes a track from the Local Storage 'favorites' list.
+       */
+      function toggleFavorite(trackToToggle) {
+        const currentTrack = trackToToggle || tracks[currentTrackIndex];
+        const existingIndex = favorites.findIndex(
+          (fav) => fav.id === currentTrack.id
+        );
+
+        if (existingIndex !== -1) {
+          // Remove from favorites
+          favorites.splice(existingIndex, 1);
+        } else {
+          // Add to favorites
+          const trackData =
+            tracks.find((t) => t.id === currentTrack.id) || currentTrack;
+          favorites.unshift(trackData);
+        }
+
+        saveFavorites();
+        updateFavoriteUI(); // Update heart icon on player
+        // Re-render the list only if the drawer is open
+        if (favoriteDrawer.classList.contains("open")) {
+          renderFavoriteList();
+        }
+      }
+
+      // --- Event Listeners and Setup ---
+
+      function setupAudioEvents() {
+        audioPlayer.addEventListener("timeupdate", () => {
+          updateProgressBar();
+        });
+
+        audioPlayer.addEventListener("ended", () => {
+          handleNextTrack(true);
+        });
+
+        audioPlayer.addEventListener("error", (e) => {
+          console.error("Audio Load Error:", e);
+          trackTitle.textContent = "Error Loading Track";
+          trackArtist.textContent = "Check console for details.";
+          isPlaying = false;
+          playPauseIcon.textContent = "play_arrow";
+          stopVibrationLoop();
+          playerCard.classList.remove("pulse");
+        });
+      }
+
+      window.onload = () => {
+        // 1. Load favorites from Local Storage immediately
+        loadFavorites();
+
+        // 2. Set up native audio listeners
+        setupAudioEvents();
+
+        // 3. Load the first track (initial state)
+        loadTrack();
+
+        // 4. Core Player Controls
+        playPauseBtn.addEventListener("click", togglePlayPause);
+        nextBtn.addEventListener("click", () => handleNextTrack(false));
+        prevBtn.addEventListener("click", handlePreviousTrack);
+
+        // NEW 10-second controls
+        rewindBtn.addEventListener("click", handleRewind);
+        forwardBtn.addEventListener("click", handleForward);
+
+        // 5. Mode Control
+        modeBtn.addEventListener("click", toggleMode);
+
+        // 6. Download, Favorite, and Favorite List Controls
+        // Download button now attached to the wrapper element
+        downloadBtnWrapper.addEventListener("click", handleDownload);
+        favoriteBtn.addEventListener("click", () => toggleFavorite());
+
+        // 7. Drawer Toggles
+        playlistToggleButton.addEventListener("click", () => togglePlaylist());
+        closePlaylistBtn.addEventListener("click", () => togglePlaylist(false));
+
+        favoriteListToggleBtn.addEventListener("click", () =>
+          toggleFavoriteList()
+        );
+        closeFavoriteListBtn.addEventListener("click", () =>
+          toggleFavoriteList(false)
+        );
+
+        // Initial UI Update
+        updateModeUI();
+        updateFavoriteUI();
+      };
+    </script>
+  </body>
 </html>
