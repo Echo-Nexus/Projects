@@ -768,9 +768,12 @@
        * Handles changing to the next track, respecting shuffle/repeat all.
        */
       function handleNextTrack(triggeredByEnd = false) {
-        const wasPlaying = isPlaying;
-
+        // If repeat one is active and triggered by end, just repeat current song.
         if (repeatMode === 2 && triggeredByEnd) {
+          audioPlayer.currentTime = 0;
+          audioPlayer.play().catch((e) => {
+            console.error("Autoplay failed:", e);
+          });
           return;
         }
 
@@ -785,21 +788,13 @@
         }
 
         if (currentTrackIndex >= tracks.length) {
-          if (repeatMode === 1) {
-            currentTrackIndex = 0;
-          } else if (repeatMode === 0 && triggeredByEnd) {
-            currentTrackIndex = 0;
-            loadTrack(false);
-            isPlaying = false;
-            playPauseIcon.textContent = "play_arrow";
-            playerCard.classList.remove("pulse");
-            return;
-          } else {
-            currentTrackIndex = 0;
-          }
+          currentTrackIndex = 0;
         }
 
-        loadTrack(wasPlaying);
+        // When triggered by end event, always play the next track
+        // When triggered manually (user click), respect the current playing state
+        const shouldAutoPlay = triggeredByEnd ? true : isPlaying;
+        loadTrack(shouldAutoPlay);
       }
 
       /**
@@ -886,6 +881,7 @@
         });
 
         audioPlayer.addEventListener("ended", () => {
+          // Always pass true to ensure automatic playback when a song ends
           handleNextTrack(true);
         });
 
