@@ -315,11 +315,6 @@
       let isShuffling = false;
       let repeatMode = 0; // 0: Off, 1: Repeat All, 2: Repeat One
 
-      // VIBRATION CONTROLS
-      let vibrationInterval;
-      const VIBRATION_DURATION = 50;
-      const VIBRATION_INTERVAL = 500;
-
       // DOM Elements
       const audioPlayer = document.getElementById("audio-player");
       const playPauseIcon = document.getElementById("play-pause-icon");
@@ -372,35 +367,6 @@
         const paddedMinutes = String(minutes).padStart(2, "0");
         const paddedSeconds = String(remainingSeconds).padStart(2, "0");
         return `${paddedMinutes}:${paddedSeconds}`;
-      }
-
-      /**
-       * Starts the periodic vibration loop.
-       */
-      function startVibrationLoop() {
-        if (navigator.vibrate) {
-          navigator.vibrate(VIBRATION_DURATION);
-          vibrationInterval = setInterval(() => {
-            if (isPlaying) {
-              navigator.vibrate(VIBRATION_DURATION);
-            } else {
-              stopVibrationLoop();
-            }
-          }, VIBRATION_INTERVAL);
-        }
-      }
-
-      /**
-       * Stops the vibration loop.
-       */
-      function stopVibrationLoop() {
-        if (vibrationInterval) {
-          clearInterval(vibrationInterval);
-          vibrationInterval = null;
-        }
-        if (navigator.vibrate) {
-          navigator.vibrate(0);
-        }
       }
 
       /**
@@ -686,7 +652,6 @@
                   );
                   isPlaying = false;
                   playPauseIcon.textContent = "play_arrow";
-                  stopVibrationLoop();
                   playerCard.classList.remove("pulse");
                 }
               });
@@ -730,14 +695,12 @@
       audioPlayer.addEventListener("play", () => {
         playPauseIcon.textContent = "pause";
         isPlaying = true;
-        startVibrationLoop();
         playerCard.classList.add("pulse");
       });
 
       audioPlayer.addEventListener("pause", () => {
         playPauseIcon.textContent = "play_arrow";
         isPlaying = false;
-        stopVibrationLoop();
         playerCard.classList.remove("pulse");
       });
 
@@ -788,7 +751,6 @@
        */
       function handleRewind() {
         audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 10);
-        if (navigator.vibrate) navigator.vibrate(20);
       }
 
       /**
@@ -800,7 +762,6 @@
           duration,
           audioPlayer.currentTime + 10
         );
-        if (navigator.vibrate) navigator.vibrate(20);
       }
 
       /**
@@ -831,7 +792,6 @@
             loadTrack(false);
             isPlaying = false;
             playPauseIcon.textContent = "play_arrow";
-            stopVibrationLoop();
             playerCard.classList.remove("pulse");
             return;
           } else {
@@ -935,7 +895,6 @@
           trackArtist.textContent = "Check console for details.";
           isPlaying = false;
           playPauseIcon.textContent = "play_arrow";
-          stopVibrationLoop();
           playerCard.classList.remove("pulse");
         });
       }
