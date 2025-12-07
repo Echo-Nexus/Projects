@@ -1,5 +1,5 @@
 const tracks = [
-  {
+/*  {
     id: "1",
     title: "My Love Is Science ",
     artist: "Arix Ratgaiya",
@@ -117,18 +117,19 @@ const tracks = [
     art: "https://i.ytimg.com/vi/W8a4sUabCUo/maxresdefault.jpg",
     url: "https://www.dropbox.com/scl/fi/ifzz0ry871m88zf612xs8/SpotiDownloader.com-Dandelions-Ruth-B..mp3?rlkey=vr4l8e8haepv9lzj5fs3ctvag&st=whgnta1y&raw=1",
   },
+  */
   {
-    id: "16",
+    id: "1",
     title: "JavaScript DSA",
     artist: "Arix Ratgaiya",
     art: "https://media.istockphoto.com/id/614225844/photo/programming-concept.jpg?s=2048x2048&w=is&k=20&c=U8V3QxZSJtARZWqBQmjg_NiJUs-bCG_3cA8PlDS2GIc=",
     url: "https://www.dropbox.com/scl/fi/ir2i5ilhp53ll7ib17qrb/_JavaScript_DSA_-_-_.m4a?rlkey=ob357drd9qwjbatsolom9oauz&st=i4ekyuug&raw=1",
   },
   {
-    id: "17",
+    id: "2",
     title: "VESPR Theory & Lewis Structure",
     artist: "Arix Ratgaiya",
-    art: "https://unsplash.com/illustrations/a-blue-background-with-different-types-of-science-equipment-pHKYZ6knROM",
+    art: "https://plus.unsplash.com/premium_vector-1722924735259-1c3369ee89b1?q=80&w=1207&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     url: "https://www.dropbox.com/scl/fi/n9jod27f8vdchkclk0m6v/_-_VSEPR_-_-D_.m4a?rlkey=hcsrnqg75hznwmp1xzvbozk6n&st=2bs5dwo3&raw=1",
   },
 ];
