@@ -1,11 +1,18 @@
 const tracks = [
   {
     id: "1",
-    title: "My Love Is Science ",
-    artist: "Arix Ratgaiya",
-    art: "https://plus.unsplash.com/premium_photo-1681426558755-71090cebadff?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    url: "https://www.dropbox.com/scl/fi/vmlxz8gzvxb9ssy4og05r/I-will-not-stop.mp3?rlkey=j8x3qex71vai74xfdqjnvcuit&st=zc4ii9ts&raw=1",
+    title: "Summartime Sadness",
+    artist: "Lana Del Rey",
+    art: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    url: "https://www.dropbox.com/scl/fi/07jui544x76bgdj5wzten/SpotiDownloader.com-Summertime-Sadness-Lana-Del-Rey.mp3?rlkey=7uexs3zlc3g7r35f9p6m2mqpc&st=aaambntt&raw=1",
   },
+  // {
+  //   id: "1",
+  //   title: "My Love Is Science ",
+  //   artist: "Arix Ratgaiya",
+  //   art: "https://plus.unsplash.com/premium_photo-1681426558755-71090cebadff?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  //   url: "https://www.dropbox.com/scl/fi/vmlxz8gzvxb9ssy4og05r/I-will-not-stop.mp3?rlkey=j8x3qex71vai74xfdqjnvcuit&st=zc4ii9ts&raw=1",
+  // },
 
   {
     id: "2",
@@ -134,4 +141,5 @@ const tracks = [
     art: "https://plus.unsplash.com/premium_vector-1722924735259-1c3369ee89b1?q=80&w=1207&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     url: "https://www.dropbox.com/scl/fi/n9jod27f8vdchkclk0m6v/_-_VSEPR_-_-D_.m4a?rlkey=hcsrnqg75hznwmp1xzvbozk6n&st=2bs5dwo3&raw=1",
   },
+
 ];
