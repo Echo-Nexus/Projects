@@ -141,5 +141,11 @@ const tracks = [
     art: "https://plus.unsplash.com/premium_vector-1722924735259-1c3369ee89b1?q=80&w=1207&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     url: "https://www.dropbox.com/scl/fi/n9jod27f8vdchkclk0m6v/_-_VSEPR_-_-D_.m4a?rlkey=hcsrnqg75hznwmp1xzvbozk6n&st=2bs5dwo3&raw=1",
   },
-
+  {
+    id:18,
+    title:"Rich Dad Poor Dad",
+    artist:"Robert.T Kiyosaki",
+    art:"https://images.blinkist.io/images/books/528232a7333464000c300000/1_1/470.jpg",
+    url:"https://www.dropbox.com/scl/fi/scew41l3vvshxvflb0a02/RICH_DAD_POOR_DAD.mp3?rlkey=yk69beg6pj8cd7mzm6lj51xlz&st=znhm12n2&raw=1",
+  },
 ];
